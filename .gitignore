@@ -1,0 +1,34 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+
+# Restricted source data and derived databases
+mimiciv/
+data/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.csv.gz
+*.parquet
+
+# Generated reports and screenshots
+reports/*.json
+reports/*.csv
+reports/ui/
+
+# Manuscript drafts and local authoring artifacts
+论文初稿/
+论文更新版_*/
+*.docx
+*.pdf
+*.pptx
+
+# Local runtime files
+__pycache__/
+*.py[cod]
+.DS_Store
+*.log
+.venv/
+venv/

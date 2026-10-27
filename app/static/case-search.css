@@ -1,0 +1,22 @@
+.case-search-panel{margin-bottom:22px;background:linear-gradient(115deg,#f2f8f5,#fffefa)}
+.case-search-panel h2{margin:5px 0 6px;font-size:21px}
+.case-search-panel p{font-size:12px;color:var(--muted)}
+.case-search-form{margin-top:18px;gap:10px;align-items:end}
+.case-search-form label{flex:1;min-width:160px;font-size:11px}
+.case-search-form input{width:100%;height:44px;background:#fffefa;font-size:14px}
+.case-search-form .primary{height:44px;padding:9px 24px}
+.case-search-form .text-button{height:44px}
+.case-search-examples{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:13px;font-size:11px;color:var(--muted)}
+.case-search-examples .preset{font-size:11px}
+.case-search-panel .case-search-scope{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);overflow-wrap:anywhere}
+.table-toolbar #record-search{width:230px;max-width:100%}
+.case-search-status{margin:6px 0 15px;font-size:13px;overflow-wrap:anywhere}
+.case-search-status span{color:var(--muted);font-size:11px;margin-left:8px}
+.case-empty-actions{margin-top:12px;display:flex;justify-content:center;gap:10px}
+@media(max-width:680px){
+  .case-search-form label{flex-basis:100%}
+  .case-search-form .primary{flex:1}
+  .case-search-panel h2{font-size:19px}
+  .case-search-status span{display:block;margin-left:0}
+  .table-toolbar #record-search{width:100%}
+}

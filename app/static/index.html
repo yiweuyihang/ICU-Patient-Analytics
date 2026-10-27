@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f2f5fa">
+  <title>ICU Atlas · 重症数据探索</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/soft.css?v=chat-narrative-2">
+  <link rel="stylesheet" href="/analysis-tools.css?v=1">
+  <link rel="stylesheet" href="/case-search.css?v=1">
+  <link rel="stylesheet" href="/glass.css?v=1">
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="#overview"><span class="brand-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span><span>ICU Atlas<small>重症数据探索</small></span></a>
+  <div class="nav-caption">分析工作台</div>
+  <nav aria-label="主导航">
+    <button data-page="overview" class="nav-item active" aria-current="page"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M10 9v12"/></svg></span>数据总览<i>01</i></button>
+    <button data-page="explore" class="nav-item"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10m5 10V6m5 14v-8m5 8V3M3 6l5-3 6 5 6-6"/></svg></span>群体探索<i>02</i></button>
+    <button data-page="cases" class="nav-item"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span>案例搜索<i>03</i></button>
+    <button data-page="detail" class="nav-item" id="detail-nav" disabled><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span>入住详情<i>04</i></button>
+  </nav>
+  <div class="sidebar-note"><span class="status-dot"></span>本地数据库已连接<p>MIMIC-IV · v3.1</p><small>真实数据 / 只读分析</small></div>
+  <div class="sidebar-footer">从群体分布，走近每一次入住。<br><span>ICU DATA EXPLORER</span></div>
+</aside>
+<main>
+  <header class="topbar"><span>研究工作台 <b>/</b> <span id="breadcrumb">数据总览</span></span><div class="topbar-actions"><span class="dataset-badge">MIMIC-IV 3.1 <span>●</span></span><button type="button" class="assistant-toggle" id="assistant-toggle" aria-controls="assistant-drawer" aria-expanded="false">✧ 数据分析助手 <span>↗</span></button></div></header>
+  <section class="page-heading"><div><div class="eyebrow">CLINICAL DATA · VISUAL EXPLORATION</div><h1 id="page-title">观生命之象，探疾患之理。</h1><p id="page-description">从整体分布开始，探索 ICU 患者构成与停留时长。</p></div><div class="heading-aside"><span>分析队列</span><strong>94,363<small> 次入住</small></strong><span>65,287 位患者 · 全量纳入队列</span></div></section>
+  <section class="filters" id="filter-panel" aria-label="全局筛选">
+    <div class="filter-title"><strong>筛选分析范围</strong><span>所有视图同步更新</span></div>
+    <form id="filter-form">
+      <label>年龄组<select name="age" id="age-filter"><option value="">全部年龄</option><option value="18-39">18–39 岁</option><option value="40-64">40–64 岁</option><option value="65-79">65–79 岁</option><option value="80-89">80–89 岁</option><option value="90+">90 岁及以上</option><option value="65+">65 岁及以上</option></select></label>
+      <label>性别<select name="gender" id="gender-filter"><option value="">全部性别</option><option value="F">女性</option><option value="M">男性</option></select></label>
+      <label class="unit-filter">ICU 类型<select name="unit" id="unit-filter"><option value="">全部 ICU 类型</option></select></label>
+      <label>停留天数 ≥<input name="los_min" id="los-min" type="number" min="0" step="any" placeholder="不限"></label>
+      <label>停留天数 &lt;<input name="los_max" id="los-max" type="number" min="0" step="any" placeholder="不限"></label>
+      <button class="primary" type="submit">应用筛选 <span>↗</span></button><button type="button" class="text-button" id="reset">重置</button>
+    </form>
+    <div id="filter-chips" class="chips"></div>
+    <div id="filter-action-notice" class="filter-action-notice" role="status" aria-live="polite" hidden></div>
+  </section>
+  <div id="message" role="alert" hidden></div>
+  <div id="loading" role="status" hidden><span class="spinner"></span>正在查询分析队列…</div>
+  <div id="page-content"></div>
+  <footer class="main-footer"><span>统计单位：一次 ICU 入住（stay_id） · 年龄为估计值，高龄脱敏组显示为 90+</span><span>数据来源：PhysioNet MIMIC-IV 3.1</span></footer>
+</main>
+<dialog id="assistant-drawer" class="assistant-drawer" aria-labelledby="assistant-drawer-title">
+  <div class="drawer-heading"><div><span class="eyebrow">YOUR ANALYSIS COMPANION</span><h2 id="assistant-drawer-title">数据分析助手</h2></div><button type="button" id="assistant-close" class="drawer-close" aria-label="关闭数据分析助手">✕</button></div>
+  <section class="panel ai-summary" id="ai-summary" aria-label="数据分析助手">
+    <div class="chat-workspace">
+      <aside class="chat-sidebar" aria-label="历史对话">
+        <button class="primary" id="new-chat" type="button">＋ 新建对话</button>
+        <div class="chat-history-heading">历史对话 <span>保存在本机浏览器</span></div>
+        <div id="chat-session-list"></div>
+        <p class="chat-storage-note">新建对话不会删除旧记录。选择历史对话时，恢复当时的筛选范围。</p>
+      </aside>
+      <div class="chat-main">
+        <div class="ai-summary-heading"><div><span class="ai-badge">✧ DeepSeek</span><h2>数据分析助手</h2><p id="chat-session-title">新对话 · 从一个问题开始</p></div></div>
+        <p class="ai-scope" id="ai-scope">正在载入分析范围…</p>
+        <p class="ai-hint">描述条件 → 核对建议 → 点击应用，也可以继续解读当前图表。问题、最近五轮会话和群体统计将发送至 DeepSeek；历史保留在本机。</p>
+        <p id="ai-status" role="status" aria-live="polite"></p>
+        <div id="ai-result" class="chat-messages" role="log" aria-label="对话记录" aria-live="polite"></div>
+        <button class="filter-preset" type="button" data-question="请筛出65岁及以上、ICU停留至少7天的入住，先给我筛选条件。">⌘ 试试一句话筛选：65 岁及以上，停留至少 7 天 ↗</button>
+        <details class="chat-prompts filter-prompt-fold">
+          <summary class="chat-prompts-heading">更多提问范式 <span>点击展开，填入后可编辑</span></summary>
+          <div class="chat-suggestions" aria-label="提问范式">
+            <button class="preset" type="button" data-question="请概括当前筛选队列的样本量、年龄与性别构成，以及 ICU 停留时长的主要特点。"><b>① 描述队列</b><span>请概括当前队列的规模、构成和停留时长。</span></button>
+            <button class="preset" type="button" data-question="请比较当前队列中不同 ICU 类型的停留时长，列出各组样本量、中位数及四分位数，并说明解读限制。"><b>② 比较群体</b><span>比较不同 ICU 类型，列出样本量与分位数。</span></button>
+            <button class="preset" type="button" data-question="请分析当前队列的年龄构成，给出各年龄组的入住次数及占比，并说明高龄脱敏组的统计口径。"><b>③ 分析分布</b><span>分析年龄构成，用次数和占比说明。</span></button>
+          </div>
+          <details class="more-prompts"><summary>更多提问范式</summary>
+            <button class="preset" type="button" data-question="请解释刚才结论对应的统计依据，并区分数据直接支持的结论和当前无法判断的内容。">④ 追问依据：刚才的结论依据是什么？</button>
+            <button class="preset" type="button" data-question="如果想研究65岁及以上且ICU停留至少7天的入住，我应如何设置页面筛选？哪些结论还需要额外数据验证？">⑤ 规划分析：如何筛选研究队列，还缺哪些证据？</button>
+          </details>
+        </details>
+        <form id="chat-form" class="chat-form">
+          <label class="screen-reader" for="chat-input">向数据分析助手提问</label>
+          <textarea id="chat-input" rows="2" maxlength="1500" placeholder="描述筛选条件，或询问当前队列。例如：只看女性，停留至少7天…" required></textarea>
+          <button class="primary" id="chat-send" type="submit" disabled>发送 ↗</button>
+        </form>
+        <p class="chat-input-note">Enter 发送 · Shift + Enter 换行 · 旧对话可从左侧重新打开</p>
+        <details id="ai-evidence" hidden><summary>查看本次统计依据</summary><pre id="ai-evidence-text"></pre></details>
+      </div>
+    </div>
+  </section>
+</dialog>
+<div id="tooltip" role="tooltip" hidden></div>
+<script src="/chat-store.js?v=1"></script>
+<script src="/analysis-tools.js?v=glass-1"></script>
+<script src="/chat-actions.js?v=case-search-1"></script>
+<script src="/app.js?v=glass-1"></script>
+</body></html>
